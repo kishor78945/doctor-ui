@@ -39,7 +39,7 @@ An AI-powered medical discharge summary generator that converts doctor voice dic
 
 ```bash
 # Clone the repository
-git clone https://github.com/YOUR_USERNAME/doctor-ui.git
+git clone https://github.com/kishor78945/doctor-ui.git
 cd doctor-ui
 
 # Create virtual environment
