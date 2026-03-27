@@ -4,7 +4,6 @@ An AI-powered medical discharge summary generator that converts doctor voice dic
 
 ![Python](https://img.shields.io/badge/Python-3.10+-blue?logo=python)
 ![Flask](https://img.shields.io/badge/Flask-Web_Framework-green?logo=flask)
-![License](https://img.shields.io/badge/License-MIT-yellow)
 
 ## Features
 
@@ -117,6 +116,6 @@ doctor-ui/
     └── ...
 ```
 
-## License
+## Disclaimer
 
-This project is licensed under the MIT License.
+This project is built for **educational purposes only**.
