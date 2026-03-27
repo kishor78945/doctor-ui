@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Summaries | Discharge Summary System</title>
+    <style>
+        :root {
+            --bg-dark: #0a0e17;
+            --bg-card: rgba(15, 20, 35, 0.6);
+            --card-border: rgba(99, 102, 241, 0.15);
+            --text-primary: #f9fafb;
+            --text-secondary: #9ca3af;
+            --text-muted: #6b7280;
+            --accent: #818cf8;
+            --accent-glow: rgba(99, 102, 241, 0.4);
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, var(--bg-dark) 0%, #0f172a 50%, #1a1a2e 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        .shell {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 32px;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #f9fafb, #818cf8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header-nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            margin-left: 24px;
+            font-size: 14px;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .header-nav a:hover {
+            color: var(--accent);
+        }
+
+        .search-card {
+            background: var(--bg-card);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+            backdrop-filter: blur(16px);
+        }
+
+        .search-form {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            align-items: flex-end;
+        }
+
+        .form-group {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 16px;
+            background: rgba(15, 20, 35, 0.8);
+            border: 1px solid var(--card-border);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-size: 14px;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #6366f1, #7c3aed);
+            color: white;
+            box-shadow: 0 4px 16px var(--accent-glow);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px var(--accent-glow);
+        }
+
+        .btn-secondary {
+            background: rgba(99, 102, 241, 0.1);
+            color: var(--accent);
+            border: 1px solid var(--card-border);
+        }
+
+        .results-card {
+            background: var(--bg-card);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            backdrop-filter: blur(16px);
+            overflow: hidden;
+        }
+
+        .results-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--card-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .results-title {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .results-count {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            padding: 14px 20px;
+            text-align: left;
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        th {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+            background: rgba(15, 20, 35, 0.4);
+        }
+
+        td {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        tr:hover {
+            background: rgba(99, 102, 241, 0.05);
+        }
+
+        .action-link {
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 500;
+            margin-right: 12px;
+        }
+
+        .action-link:hover {
+            text-decoration: underline;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-muted);
+        }
+
+        .empty-state .icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        .pagination {
+            padding: 20px 24px;
+            border-top: 1px solid var(--card-border);
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .page-link {
+            padding: 8px 14px;
+            border-radius: 6px;
+            background: rgba(15, 20, 35, 0.6);
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 13px;
+        }
+
+        .page-link:hover,
+        .page-link.active {
+            background: var(--accent);
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="shell">
+        <header class="header">
+            <h1>📋 All Discharge Summaries</h1>
+            <nav class="header-nav">
+                <a href="/">← Back to Dashboard</a>
+                <a href="/templates">Templates</a>
+                <a href="/profile">My Profile</a>
+                {% if session.role == "admin" %}
+                <a href="/admin/users">Manage Users</a>
+                <a href="/admin/audit_logs">Audit Logs</a>
+                {% endif %}
+                <a href="/logout">Logout</a>
+            </nav>
+        </header>
+
+        <!-- Search Form -->
+        <div class="search-card">
+            <form class="search-form" method="GET" action="/summaries">
+                <div class="form-group">
+                    <label for="patient">Patient Name</label>
+                    <input type="text" id="patient" name="patient" placeholder="Search by name..."
+                        value="{{ request.args.get('patient', '') }}">
+                </div>
+                <div class="form-group">
+                    <label for="hospital_id">Hospital ID</label>
+                    <input type="text" id="hospital_id" name="hospital_id" placeholder="e.g. 245678"
+                        value="{{ request.args.get('hospital_id', '') }}">
+                </div>
+                <div class="form-group">
+                    <label for="date_from">Date From</label>
+                    <input type="date" id="date_from" name="date_from" value="{{ request.args.get('date_from', '') }}">
+                </div>
+                <div class="form-group">
+                    <label for="date_to">Date To</label>
+                    <input type="date" id="date_to" name="date_to" value="{{ request.args.get('date_to', '') }}">
+                </div>
+                <button type="submit" class="btn btn-primary">🔍 Search</button>
+                <a href="/summaries" class="btn btn-secondary">Clear</a>
+                <a href="/export/csv" class="btn btn-secondary" style="margin-left: auto;">📊 Export CSV</a>
+            </form>
+        </div>
+
+        <!-- Results -->
+        <div class="results-card">
+            <div class="results-header">
+                <div class="results-title">Search Results</div>
+                <div class="results-count">
+                    {% if pagination %}
+                    Showing {{ summaries|length }} of {{ pagination.total_count }} summaries (Page {{ pagination.page }}
+                    of {{ pagination.total_pages }})
+                    {% else %}
+                    {{ summaries|length }} summaries found
+                    {% endif %}
+                </div>
+            </div>
+
+            {% if summaries %}
+            <form id="bulk-delete-form" method="POST" action="/bulk-delete"
+                onsubmit="return confirm('Delete selected summaries? This cannot be undone.');">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                <div style="margin-bottom: 12px; display: flex; gap: 12px; align-items: center;">
+                    <button type="submit" class="btn btn-secondary" id="bulk-delete-btn" disabled
+                        style="background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3);">
+                        🗑️ Delete Selected (<span id="selected-count">0</span>)
+                    </button>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th><input type="checkbox" id="select-all" title="Select All"></th>
+                            <th>Date</th>
+                            <th>Patient Name</th>
+                            <th>Hospital ID</th>
+                            <th>Diagnosis</th>
+                            {% if session.role == "admin" %}
+                            <th>Created By</th>
+                            {% endif %}
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for s in summaries %}
+                        <tr>
+                            <td><input type="checkbox" name="selected_ids" value="{{ s.id }}" class="row-checkbox"></td>
+                            <td>{{ s.created_at }}</td>
+                            <td>{{ s.patient_name or 'Unknown' }}</td>
+                            <td>{{ s.hospital_id or '-' }}</td>
+                            <td>{{ s.diagnosis[:50] ~ '...' if s.diagnosis and s.diagnosis|length > 50 else s.diagnosis
+                                or '-' }}</td>
+                            {% if session.role == "admin" %}
+                            <td>{{ s.created_by_username or 'Unknown' }}</td>
+                            {% endif %}
+                            <td>
+                                <a href="/download/{{ s.relpath }}" class="action-link">⬇️</a>
+                                <a href="/summary/{{ s.id }}" class="action-link">👁️</a>
+                                <a href="/summary/{{ s.id }}/edit" class="action-link">✏️</a>
+                                <a href="/summary/{{ s.id }}/print" class="action-link" target="_blank">🖨️</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </form>
+            <script>
+                (function () {
+                    const selectAll = document.getElementById('select-all');
+                    const checkboxes = document.querySelectorAll('.row-checkbox');
+                    const deleteBtn = document.getElementById('bulk-delete-btn');
+                    const countSpan = document.getElementById('selected-count');
+
+                    function updateCount() {
+                        const checked = document.querySelectorAll('.row-checkbox:checked').length;
+                        countSpan.textContent = checked;
+                        deleteBtn.disabled = checked === 0;
+                    }
+
+                    selectAll.addEventListener('change', function () {
+                        checkboxes.forEach(cb => cb.checked = this.checked);
+                        updateCount();
+                    });
+
+                    checkboxes.forEach(cb => cb.addEventListener('change', updateCount));
+                })();
+            </script>
+
+            <!-- Pagination Controls -->
+            {% if pagination and pagination.total_pages > 1 %}
+            <div class="pagination">
+                {% if pagination.has_prev %}
+                <a href="/summaries?page={{ pagination.page - 1 }}&patient={{ request.args.get('patient', '') }}&hospital_id={{ request.args.get('hospital_id', '') }}&date_from={{ request.args.get('date_from', '') }}&date_to={{ request.args.get('date_to', '') }}"
+                    class="page-link">← Prev</a>
+                {% endif %}
+
+                {% for p in range(1, pagination.total_pages + 1) %}
+                {% if p == pagination.page %}
+                <span class="page-link active">{{ p }}</span>
+                {% elif p <= 3 or p> pagination.total_pages - 2 or (p >= pagination.page - 1 and p <= pagination.page +
+                        1) %} <a
+                        href="/summaries?page={{ p }}&patient={{ request.args.get('patient', '') }}&hospital_id={{ request.args.get('hospital_id', '') }}&date_from={{ request.args.get('date_from', '') }}&date_to={{ request.args.get('date_to', '') }}"
+                        class="page-link">{{ p }}</a>
+                        {% elif p == 4 or p == pagination.total_pages - 2 %}
+                        <span class="page-link" style="background: none;">...</span>
+                        {% endif %}
+                        {% endfor %}
+
+                        {% if pagination.has_next %}
+                        <a href="/summaries?page={{ pagination.page + 1 }}&patient={{ request.args.get('patient', '') }}&hospital_id={{ request.args.get('hospital_id', '') }}&date_from={{ request.args.get('date_from', '') }}&date_to={{ request.args.get('date_to', '') }}"
+                            class="page-link">Next →</a>
+                        {% endif %}
+            </div>
+            {% endif %}
+
+            {% else %}
+            <div class="empty-state">
+                <div class="icon">📭</div>
+                <p>No summaries found matching your search criteria.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Session Timeout Script -->
+    <script>
+        (function () {
+            'use strict';
+            const SESSION_TIMEOUT = 30 * 60 * 1000;
+            const WARNING_TIME = 2 * 60 * 1000;
+            let warningShown = false;
+            let warningTimeout = null;
+            let countdownInterval = null;
+
+            function createWarningModal() {
+                const modal = document.createElement('div');
+                modal.id = 'session-timeout-modal';
+                modal.style.cssText = 'display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);backdrop-filter:blur(8px);z-index:10000;align-items:center;justify-content:center;';
+                modal.innerHTML = `<div style="background:linear-gradient(135deg,rgba(15,20,35,0.95),rgba(26,31,58,0.95));border:1px solid rgba(99,102,241,0.3);border-radius:24px;padding:40px;max-width:480px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,0.5);text-align:center;"><div style="width:80px;height:80px;margin:0 auto 24px;background:linear-gradient(135deg,#f59e0b,#ef4444);border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:40px;box-shadow:0 8px 24px rgba(239,68,68,0.4);">⚠️</div><h2 style="font-size:24px;font-weight:700;color:#f9fafb;margin-bottom:16px;">Session Expiring Soon</h2><p style="font-size:15px;color:#9ca3af;margin-bottom:24px;line-height:1.6;">Your session will expire in <strong id="countdown-timer" style="color:#f59e0b;font-size:18px;">2:00</strong> due to inactivity.</p><p style="font-size:14px;color:#6b7280;margin-bottom:32px;">Click "Stay Logged In" to continue your session.</p><div style="display:flex;gap:12px;justify-content:center;"><button id="stay-logged-in-btn" style="background:linear-gradient(135deg,#6366f1,#7c3aed);color:white;border:none;padding:14px 32px;border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;box-shadow:0 4px 16px rgba(99,102,241,0.4);">Stay Logged In</button><button id="logout-now-btn" style="background:rgba(239,68,68,0.1);color:#ef4444;border:1px solid rgba(239,68,68,0.3);padding:14px 32px;border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;">Logout Now</button></div></div>`;
+                document.body.appendChild(modal);
+                return modal;
+            }
+
+            function showWarning() {
+                if (warningShown) return;
+                warningShown = true;
+                const modal = document.getElementById('session-timeout-modal') || createWarningModal();
+                modal.style.display = 'flex';
+                let remainingSeconds = WARNING_TIME / 1000;
+                const timerElement = document.getElementById('countdown-timer');
+                countdownInterval = setInterval(() => {
+                    remainingSeconds--;
+                    const minutes = Math.floor(remainingSeconds / 60);
+                    const seconds = remainingSeconds % 60;
+                    timerElement.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+                    if (remainingSeconds <= 0) {
+                        clearInterval(countdownInterval);
+                        window.location.href = '/logout';
+                    }
+                }, 1000);
+                document.getElementById('stay-logged-in-btn').onclick = () => {
+                    fetch('/keep_alive', { credentials: 'same-origin' })
+                        .then(r => r.ok ? (hideWarning(), resetWarningTimer()) : window.location.href = '/logout')
+                        .catch(() => window.location.href = '/logout');
+                };
+                document.getElementById('logout-now-btn').onclick = () => window.location.href = '/logout';
+            }
+
+            function hideWarning() {
+                const modal = document.getElementById('session-timeout-modal');
+                if (modal) modal.style.display = 'none';
+                if (countdownInterval) clearInterval(countdownInterval);
+                warningShown = false;
+            }
+
+            function resetWarningTimer() {
+                if (warningTimeout) clearTimeout(warningTimeout);
+                warningTimeout = setTimeout(showWarning, SESSION_TIMEOUT - WARNING_TIME);
+            }
+
+            ['mousedown', 'keydown', 'scroll', 'touchstart'].forEach(e => {
+                document.addEventListener(e, () => !warningShown && resetWarningTimer(), { passive: true });
+            });
+
+            resetWarningTimer();
+        })();
+    </script>
+</body>
+
+</html>

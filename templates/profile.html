@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile | Discharge Summary System</title>
+    <style>
+        :root {
+            --bg-dark: #0a0e17;
+            --bg-card: rgba(15, 20, 35, 0.6);
+            --card-border: rgba(99, 102, 241, 0.15);
+            --text-primary: #f9fafb;
+            --text-secondary: #9ca3af;
+            --text-muted: #6b7280;
+            --accent: #818cf8;
+            --accent-glow: rgba(99, 102, 241, 0.4);
+            --success: #10b981;
+            --danger: #ef4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, var(--bg-dark) 0%, #0f172a 50%, #1a1a2e 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        .shell {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 32px;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        .header-nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            margin-left: 20px;
+            font-size: 14px;
+        }
+
+        .header-nav a:hover {
+            color: var(--accent);
+        }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 32px;
+            backdrop-filter: blur(16px);
+            margin-bottom: 24px;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 24px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .info-item {
+            padding: 16px;
+            background: rgba(15, 20, 35, 0.5);
+            border-radius: 12px;
+        }
+
+        .info-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+
+        .info-value {
+            font-size: 16px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 16px;
+            background: rgba(15, 20, 35, 0.8);
+            border: 1px solid var(--card-border);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-size: 14px;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #6366f1, #7c3aed);
+            color: white;
+        }
+
+        .success-msg {
+            padding: 12px 16px;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 10px;
+            color: var(--success);
+            margin-bottom: 20px;
+        }
+
+        .error-msg {
+            padding: 12px 16px;
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 10px;
+            color: var(--danger);
+            margin-bottom: 20px;
+        }
+
+        .role-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .role-admin {
+            background: rgba(99, 102, 241, 0.2);
+            color: var(--accent);
+        }
+
+        .role-user {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="shell">
+        <header class="header">
+            <h1>👤 My Profile</h1>
+            <nav class="header-nav">
+                <a href="/">Dashboard</a>
+                <a href="/summaries">All Summaries</a>
+                <a href="/templates">Templates</a>
+                <a href="/logout">Logout</a>
+            </nav>
+        </header>
+
+        <!-- Account Info -->
+        <div class="card">
+            <div class="card-title">Account Information</div>
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-label">Username</div>
+                    <div class="info-value">{{ user.username }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Role</div>
+                    <div class="info-value">
+                        <span class="role-badge role-{{ user.role }}">{{ user.role }}</span>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Member Since</div>
+                    <div class="info-value">{{ user.created_at or 'Unknown' }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Total Summaries Created</div>
+                    <div class="stat-value">{{ stats.total_summaries }}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Change Password -->
+        <div class="card">
+            <div class="card-title">Change Password</div>
+
+            {% if success %}
+            <div class="success-msg">{{ success }}</div>
+            {% endif %}
+
+            {% if error %}
+            <div class="error-msg">{{ error }}</div>
+            {% endif %}
+
+            <form method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+
+                <div class="form-group">
+                    <label for="current_password">Current Password</label>
+                    <input type="password" id="current_password" name="current_password" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="new_password">New Password</label>
+                    <input type="password" id="new_password" name="new_password" required
+                        pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$"
+                        title="At least 8 characters with uppercase, lowercase, number, and special character">
+                </div>
+
+                <div class="form-group">
+                    <label for="confirm_password">Confirm New Password</label>
+                    <input type="password" id="confirm_password" name="confirm_password" required>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Update Password</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Session Timeout Script -->
+    <script>
+        (function () {
+            'use strict';
+            const SESSION_TIMEOUT = 30 * 60 * 1000;
+            const WARNING_TIME = 2 * 60 * 1000;
+            let warningShown = false;
+            let warningTimeout = null;
+            let countdownInterval = null;
+
+            function createWarningModal() {
+                const modal = document.createElement('div');
+                modal.id = 'session-timeout-modal';
+                modal.style.cssText = 'display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);backdrop-filter:blur(8px);z-index:10000;align-items:center;justify-content:center;';
+                modal.innerHTML = `<div style="background:linear-gradient(135deg,rgba(15,20,35,0.95),rgba(26,31,58,0.95));border:1px solid rgba(99,102,241,0.3);border-radius:24px;padding:40px;max-width:480px;width:90%;text-align:center;"><h2 style="font-size:24px;color:#f9fafb;margin-bottom:16px;">Session Expiring Soon</h2><p style="color:#9ca3af;margin-bottom:24px;">Your session will expire in <strong id="countdown-timer" style="color:#f59e0b;">2:00</strong></p><div style="display:flex;gap:12px;justify-content:center;"><button id="stay-logged-in-btn" style="background:linear-gradient(135deg,#6366f1,#7c3aed);color:white;border:none;padding:14px 32px;border-radius:12px;font-weight:600;cursor:pointer;">Stay Logged In</button><button id="logout-now-btn" style="background:rgba(239,68,68,0.1);color:#ef4444;border:1px solid rgba(239,68,68,0.3);padding:14px 32px;border-radius:12px;font-weight:600;cursor:pointer;">Logout</button></div></div>`;
+                document.body.appendChild(modal);
+                return modal;
+            }
+
+            function showWarning() {
+                if (warningShown) return;
+                warningShown = true;
+                const modal = document.getElementById('session-timeout-modal') || createWarningModal();
+                modal.style.display = 'flex';
+                let remainingSeconds = WARNING_TIME / 1000;
+                countdownInterval = setInterval(() => {
+                    remainingSeconds--;
+                    document.getElementById('countdown-timer').textContent = `${Math.floor(remainingSeconds / 60)}:${(remainingSeconds % 60).toString().padStart(2, '0')}`;
+                    if (remainingSeconds <= 0) { clearInterval(countdownInterval); window.location.href = '/logout'; }
+                }, 1000);
+                document.getElementById('stay-logged-in-btn').onclick = () => {
+                    fetch('/keep_alive', { credentials: 'same-origin' }).then(r => r.ok ? (hideWarning(), resetWarningTimer()) : window.location.href = '/logout');
+                };
+                document.getElementById('logout-now-btn').onclick = () => window.location.href = '/logout';
+            }
+
+            function hideWarning() { const m = document.getElementById('session-timeout-modal'); if (m) m.style.display = 'none'; clearInterval(countdownInterval); warningShown = false; }
+            function resetWarningTimer() { if (warningTimeout) clearTimeout(warningTimeout); warningTimeout = setTimeout(showWarning, SESSION_TIMEOUT - WARNING_TIME); }
+            ['mousedown', 'keydown', 'scroll', 'touchstart'].forEach(e => document.addEventListener(e, () => !warningShown && resetWarningTimer(), { passive: true }));
+            resetWarningTimer();
+        })();
+    </script>
+</body>
+
+</html>

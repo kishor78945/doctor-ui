@@ -1,0 +1,7 @@
+flask
+flask-wtf
+reportlab
+openai-whisper
+pydub
+pywebview
+pyinstaller

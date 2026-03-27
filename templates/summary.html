@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Discharge Summary Draft</title>
+    <style>
+        :root {
+            --bg-primary: #0a0e27;
+            --bg-secondary: #0f1419;
+            --card-bg: rgba(15, 20, 35, 0.7);
+            --card-border: rgba(99, 102, 241, 0.2);
+            --accent: #6366f1;
+            --accent-hover: #7c3aed;
+            --success: #10b981;
+            --danger: #ef4444;
+            --text-primary: #f9fafb;
+            --text-secondary: #9ca3af;
+            --text-muted: #6b7280;
+            --glow: rgba(99, 102, 241, 0.15);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 50%, #0a0e27 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: 32px 24px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at 20% 50%, rgba(99, 102, 241, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(124, 58, 237, 0.08) 0%, transparent 50%);
+            animation: float 20s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translate(0, 0) rotate(0deg);
+            }
+
+            33% {
+                transform: translate(30px, -30px) rotate(120deg);
+            }
+
+            66% {
+                transform: translate(-20px, 20px) rotate(240deg);
+            }
+        }
+
+        .top-nav {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 24px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .top-nav a {
+            font-size: 13px;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .top-nav a:first-child {
+            color: var(--accent);
+            background: rgba(99, 102, 241, 0.1);
+        }
+
+        .top-nav a:first-child:hover {
+            background: rgba(99, 102, 241, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .top-nav a:last-child {
+            color: var(--danger);
+            background: rgba(239, 68, 68, 0.1);
+        }
+
+        .top-nav a:last-child:hover {
+            background: rgba(239, 68, 68, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .shell {
+            max-width: 1400px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 32px;
+            padding: 24px;
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            border: 1px solid var(--card-border);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .header-title h1 {
+            font-size: 28px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 6px;
+        }
+
+        .header-title p {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .logo-placeholder {
+            width: 140px;
+            height: 48px;
+            border-radius: 14px;
+            border: 1px dashed var(--card-border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            color: var(--text-muted);
+            background: rgba(15, 23, 42, 0.5);
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: minmax(0, 2.1fr) minmax(0, 1fr);
+            gap: 24px;
+        }
+
+        @media (max-width: 1200px) {
+            .layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            border: 1px solid var(--card-border);
+            padding: 28px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--accent), transparent);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .card:hover::before {
+            opacity: 1;
+        }
+
+        .card:hover {
+            border-color: rgba(99, 102, 241, 0.4);
+            box-shadow: 0 12px 48px rgba(99, 102, 241, 0.15);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .chip {
+            border-radius: 999px;
+            padding: 6px 14px;
+            background: rgba(99, 102, 241, 0.15);
+            border: 1px solid var(--card-border);
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .transcript-box {
+            max-height: 400px;
+            overflow-y: auto;
+            padding: 16px;
+            border-radius: 16px;
+            background: rgba(15, 20, 35, 0.6);
+            border: 1px solid var(--card-border);
+            font-size: 14px;
+            line-height: 1.7;
+            color: var(--text-secondary);
+        }
+
+        .transcript-box::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .transcript-box::-webkit-scrollbar-track {
+            background: rgba(15, 20, 35, 0.4);
+            border-radius: 4px;
+        }
+
+        .transcript-box::-webkit-scrollbar-thumb {
+            background: var(--accent);
+            border-radius: 4px;
+        }
+
+        .section-full {
+            margin-top: 28px;
+        }
+
+        .section-full:first-child {
+            margin-top: 0;
+        }
+
+        .section-title {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: var(--text-primary);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .sections-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            column-gap: 20px;
+            row-gap: 16px;
+        }
+
+        .field-row {
+            margin-bottom: 16px;
+        }
+
+        label {
+            display: block;
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        input,
+        textarea,
+        select {
+            width: 100%;
+            border-radius: 12px;
+            border: 1px solid var(--card-border);
+            padding: 10px 14px;
+            font-size: 14px;
+            background: rgba(15, 20, 35, 0.6);
+            color: var(--text-primary);
+            outline: none;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        input:focus,
+        textarea:focus,
+        select:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+            background: rgba(15, 20, 35, 0.8);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+            line-height: 1.6;
+        }
+
+        .two-cols {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 16px;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+            margin-top: 12px;
+            border-radius: 16px;
+            border: 1px solid var(--card-border);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            font-size: 13px;
+        }
+
+        th,
+        td {
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background: rgba(15, 20, 35, 0.8);
+            color: var(--text-muted);
+            font-weight: 600;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        th:first-child {
+            border-top-left-radius: 16px;
+        }
+
+        th:last-child {
+            border-top-right-radius: 16px;
+        }
+
+        td {
+            border-bottom: 1px solid rgba(99, 102, 241, 0.1);
+        }
+
+        tbody tr {
+            transition: all 0.2s ease;
+        }
+
+        tbody tr:hover {
+            background: rgba(99, 102, 241, 0.05);
+        }
+
+        tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        td input {
+            font-size: 13px;
+            padding: 8px 10px;
+            border-radius: 8px;
+        }
+
+        .footer-bar {
+            margin-top: 32px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+
+        .btn {
+            border-radius: 16px;
+            padding: 14px 32px;
+            border: none;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-hover) 100%);
+            color: white;
+            box-shadow: 0 4px 16px rgba(99, 102, 241, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 24px rgba(99, 102, 241, 0.4);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border: 1px solid var(--card-border);
+            color: var(--text-secondary);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+            transform: translateY(-2px);
+        }
+
+        .pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 999px;
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--success);
+            font-size: 11px;
+            font-weight: 500;
+            margin-left: 12px;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .warning-icon {
+            font-size: 14px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="top-nav">
+        <a href="{{ url_for('index') }}">← Back to Dashboard</a>
+        <a href="{{ url_for('logout') }}">Logout</a>
+    </div>
+
+    <div class="shell">
+        <header class="header">
+            <div class="header-title">
+                <h1>Discharge Summary Draft</h1>
+                <p>Review, edit and confirm the auto-generated discharge summary.</p>
+            </div>
+            <div class="logo-placeholder">
+                Insert your logo here
+            </div>
+        </header>
+
+        <div class="layout">
+            <!-- LEFT: FORM -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Structured Summary</div>
+                    <div class="chip">Editable fields</div>
+                </div>
+
+                <form method="POST" action="/generate_pdf">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                    <!-- PATIENT INFO -->
+                    <div class="section-full">
+                        <div class="section-title">Patient Information</div>
+                        <div class="sections-grid">
+                            <div class="field-row">
+                                <label>Name</label>
+                                <input type="text" name="patient_name"
+                                    value="{{ discharge_data['patient_info']['name'] }}">
+                            </div>
+                            <div class="field-row">
+                                <label>Age</label>
+                                <input type="text" name="patient_age"
+                                    value="{{ discharge_data['patient_info']['age'] }}">
+                            </div>
+                            <div class="field-row">
+                                <label>Sex</label>
+                                <input type="text" name="patient_sex"
+                                    value="{{ discharge_data['patient_info']['sex'] }}">
+                            </div>
+                            <div class="field-row">
+                                <label>Hospital ID</label>
+                                <input type="text" name="hospital_id"
+                                    value="{{ discharge_data['patient_info']['hospital_id'] }}">
+                            </div>
+                            <div class="field-row">
+                                <label>Ward</label>
+                                <input type="text" name="ward" value="{{ discharge_data['patient_info']['ward'] }}">
+                            </div>
+                            <div class="field-row">
+                                <label>Bed number</label>
+                                <input type="text" name="bed_number"
+                                    value="{{ discharge_data['patient_info']['bed_number'] }}">
+                            </div>
+                            <div class="field-row">
+                                <label>Date of admission</label>
+                                <input type="text" name="date_of_admission"
+                                    value="{{ discharge_data['patient_info']['date_of_admission'] }}">
+                            </div>
+                            <div class="field-row">
+                                <label>Date of discharge</label>
+                                <input type="text" name="date_of_discharge"
+                                    value="{{ discharge_data['patient_info']['date_of_discharge'] }}">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- DIAGNOSIS + HISTORY -->
+                    <div class="sections-grid" style="margin-top:28px;">
+                        <div>
+                            <div class="section-title">Diagnosis</div>
+                            <div class="field-row">
+                                <label>Provisional diagnosis</label>
+                                <input type="text" name="provisional_diagnosis"
+                                    value="{{ discharge_data['diagnosis']['provisional_diagnosis'] }}">
+                            </div>
+                            <div class="field-row">
+                                <label>Final diagnosis</label>
+                                <input type="text" name="final_diagnosis"
+                                    value="{{ discharge_data['diagnosis']['final_diagnosis'] }}">
+                            </div>
+                        </div>
+                        <div>
+                            <div class="section-title">Key Complaints</div>
+                            <div class="field-row">
+                                <label>Presenting complaints</label>
+                                <input type="text" name="presenting_complaints"
+                                    value="{{ discharge_data['history']['presenting_complaints'] }}">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="section-full">
+                        <div class="section-title">History</div>
+                        <div class="field-row">
+                            <label>History of presenting illness</label>
+                            <textarea
+                                name="history_of_presenting_illness">{{ discharge_data['history']['history_of_presenting_illness'] }}</textarea>
+                        </div>
+                        <div class="field-row">
+                            <label>Past medical history</label>
+                            <textarea
+                                name="past_medical_history">{{ discharge_data['history']['past_medical_history'] }}</textarea>
+                        </div>
+                    </div>
+
+                    <!-- HOSPITAL COURSE + INVESTIGATIONS -->
+                    <div class="sections-grid" style="margin-top:28px;">
+                        <div>
+                            <div class="section-title">Hospital Course</div>
+                            <textarea name="hospital_course">{{ discharge_data['hospital_course'] }}</textarea>
+                        </div>
+                        <div>
+                            <div class="section-title">Investigations</div>
+                            <textarea name="investigations">{{ discharge_data['investigations'] }}</textarea>
+                        </div>
+                    </div>
+
+                    <!-- VITALS -->
+                    <div class="section-full" style="margin-top:28px;">
+                        <div class="section-title">Vitals at Discharge</div>
+                        <div class="two-cols">
+                            <div class="field-row">
+                                <label>BP</label>
+                                <input type="text" name="bp" value="{{ discharge_data['vitals_at_discharge']['bp'] }}">
+                            </div>
+                            <div class="field-row">
+                                <label>Pulse</label>
+                                <input type="text" name="pulse"
+                                    value="{{ discharge_data['vitals_at_discharge']['pulse'] }}">
+                            </div>
+                            <div class="field-row">
+                                <label>Temperature</label>
+                                <input type="text" name="temperature"
+                                    value="{{ discharge_data['vitals_at_discharge']['temperature'] }}">
+                            </div>
+                            <div class="field-row">
+                                <label>SpO₂</label>
+                                <input type="text" name="spo2"
+                                    value="{{ discharge_data['vitals_at_discharge']['spo2'] }}">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- MEDICATIONS -->
+                    <div class="section-full" style="margin-top:28px;">
+                        <div class="section-title">
+                            Medications
+                            <span class="pill"><span class="warning-icon">⚠</span> Check doses before printing</span>
+                        </div>
+
+                        <div class="table-wrapper">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Drug name</th>
+                                        <th>Dose</th>
+                                        <th>Frequency</th>
+                                        <th>Duration</th>
+                                        <th>Remarks</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for m in discharge_data['medications'] %}
+                                    <tr>
+                                        <td><input name="drug_name" value="{{ m['drug_name'] }}"></td>
+                                        <td><input name="dose" value="{{ m['dose'] }}"></td>
+                                        <td><input name="frequency" value="{{ m['frequency'] }}"></td>
+                                        <td><input name="duration" value="{{ m['duration'] }}"></td>
+                                        <td><input name="remarks" value="{{ m['remarks'] }}"></td>
+                                    </tr>
+                                    {% endfor %}
+
+                                    <!-- one extra blank row -->
+                                    <tr>
+                                        <td><input name="drug_name" placeholder="Add new medication"></td>
+                                        <td><input name="dose"></td>
+                                        <td><input name="frequency"></td>
+                                        <td><input name="duration"></td>
+                                        <td><input name="remarks"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- DISCHARGE ADVICE -->
+                    <div class="section-full" style="margin-top:28px;">
+                        <div class="section-title">Discharge Advice</div>
+                        <div class="two-cols">
+                            <div class="field-row">
+                                <label>Diet</label>
+                                <input type="text" name="diet" value="{{ discharge_data['discharge_advice']['diet'] }}">
+                            </div>
+                            <div class="field-row">
+                                <label>Activity</label>
+                                <input type="text" name="activity"
+                                    value="{{ discharge_data['discharge_advice']['activity'] }}">
+                            </div>
+                            <div class="field-row">
+                                <label>Wound care</label>
+                                <input type="text" name="wound_care"
+                                    value="{{ discharge_data['discharge_advice']['wound_care'] }}">
+                            </div>
+                            <div class="field-row">
+                                <label>Warning signs</label>
+                                <input type="text" name="warning_signs"
+                                    value="{{ discharge_data['discharge_advice']['warning_signs'] }}">
+                            </div>
+                        </div>
+                        <div class="field-row">
+                            <label>Other instructions</label>
+                            <textarea
+                                name="other_instructions">{{ discharge_data['discharge_advice']['other_instructions'] }}</textarea>
+                        </div>
+                    </div>
+
+                    <!-- FOLLOW UP + DOCTOR -->
+                    <div class="sections-grid" style="margin-top:28px;">
+                        <div>
+                            <div class="section-title">Follow-up</div>
+                            <div class="field-row">
+                                <label>Date</label>
+                                <input type="text" name="follow_up_date"
+                                    value="{{ discharge_data['follow_up']['date'] }}">
+                            </div>
+                            <div class="field-row">
+                                <label>Department</label>
+                                <input type="text" name="follow_up_department"
+                                    value="{{ discharge_data['follow_up']['department'] }}">
+                            </div>
+                            <div class="field-row">
+                                <label>Special instructions</label>
+                                <textarea
+                                    name="follow_up_instructions">{{ discharge_data['follow_up']['special_instructions'] }}</textarea>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="section-title">Doctor</div>
+                            <div class="field-row">
+                                <label>Name</label>
+                                <input type="text" name="doctor_name" value="{{ discharge_data['doctor']['name'] }}">
+                            </div>
+                            <div class="field-row">
+                                <label>Designation</label>
+                                <input type="text" name="doctor_designation"
+                                    value="{{ discharge_data['doctor']['designation'] }}">
+                            </div>
+                            <div class="field-row">
+                                <label>Registration number</label>
+                                <input type="text" name="doctor_reg_no"
+                                    value="{{ discharge_data['doctor']['registration_number'] }}">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="footer-bar">
+                        <button type="submit" class="btn btn-primary">
+                            Generate PDF
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- RIGHT: TRANSCRIPT PANEL -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Original Dictation</div>
+                    <div class="chip">Reference only</div>
+                </div>
+                <div class="transcript-box">
+                    {{ transcript }}
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Session Timeout Script -->
+    <script>
+        (function () {
+            'use strict';
+            const SESSION_TIMEOUT = 30 * 60 * 1000;
+            const WARNING_TIME = 2 * 60 * 1000;
+            let warningShown = false;
+            let warningTimeout = null;
+            let countdownInterval = null;
+
+            function createWarningModal() {
+                const modal = document.createElement('div');
+                modal.id = 'session-timeout-modal';
+                modal.style.cssText = 'display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);backdrop-filter:blur(8px);z-index:10000;align-items:center;justify-content:center;';
+                modal.innerHTML = `<div style="background:linear-gradient(135deg,rgba(15,20,35,0.95),rgba(26,31,58,0.95));border:1px solid rgba(99,102,241,0.3);border-radius:24px;padding:40px;max-width:480px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,0.5);text-align:center;"><div style="width:80px;height:80px;margin:0 auto 24px;background:linear-gradient(135deg,#f59e0b,#ef4444);border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:40px;box-shadow:0 8px 24px rgba(239,68,68,0.4);">⚠️</div><h2 style="font-size:24px;font-weight:700;color:#f9fafb;margin-bottom:16px;">Session Expiring Soon</h2><p style="font-size:15px;color:#9ca3af;margin-bottom:24px;line-height:1.6;">Your session will expire in <strong id="countdown-timer" style="color:#f59e0b;font-size:18px;">2:00</strong> due to inactivity.</p><p style="font-size:14px;color:#6b7280;margin-bottom:32px;">Click "Stay Logged In" to continue your session.</p><div style="display:flex;gap:12px;justify-content:center;"><button id="stay-logged-in-btn" style="background:linear-gradient(135deg,#6366f1,#7c3aed);color:white;border:none;padding:14px 32px;border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;box-shadow:0 4px 16px rgba(99,102,241,0.4);">Stay Logged In</button><button id="logout-now-btn" style="background:rgba(239,68,68,0.1);color:#ef4444;border:1px solid rgba(239,68,68,0.3);padding:14px 32px;border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;">Logout Now</button></div></div>`;
+                document.body.appendChild(modal);
+                return modal;
+            }
+
+            function showWarning() {
+                if (warningShown) return;
+                warningShown = true;
+                const modal = document.getElementById('session-timeout-modal') || createWarningModal();
+                modal.style.display = 'flex';
+                let remainingSeconds = WARNING_TIME / 1000;
+                const timerElement = document.getElementById('countdown-timer');
+                countdownInterval = setInterval(() => {
+                    remainingSeconds--;
+                    const minutes = Math.floor(remainingSeconds / 60);
+                    const seconds = remainingSeconds % 60;
+                    timerElement.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+                    if (remainingSeconds <= 0) {
+                        clearInterval(countdownInterval);
+                        window.location.href = '/logout';
+                    }
+                }, 1000);
+                document.getElementById('stay-logged-in-btn').onclick = () => {
+                    fetch('/keep_alive', { credentials: 'same-origin' })
+                        .then(r => r.ok ? (hideWarning(), resetWarningTimer()) : window.location.href = '/logout')
+                        .catch(() => window.location.href = '/logout');
+                };
+                document.getElementById('logout-now-btn').onclick = () => window.location.href = '/logout';
+            }
+
+            function hideWarning() {
+                const modal = document.getElementById('session-timeout-modal');
+                if (modal) modal.style.display = 'none';
+                if (countdownInterval) clearInterval(countdownInterval);
+                warningShown = false;
+            }
+
+            function resetWarningTimer() {
+                if (warningTimeout) clearTimeout(warningTimeout);
+                warningTimeout = setTimeout(showWarning, SESSION_TIMEOUT - WARNING_TIME);
+            }
+
+            ['mousedown', 'keydown', 'scroll', 'touchstart'].forEach(e => {
+                document.addEventListener(e, () => !warningShown && resetWarningTimer(), { passive: true });
+            });
+
+            resetWarningTimer();
+        })();
+    </script>
+</body>
+
+</html>

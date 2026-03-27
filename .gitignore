@@ -1,0 +1,37 @@
+# Virtual environment
+.venv/
+venv/
+env/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+
+# PyInstaller build artifacts
+build/
+dist/
+*.spec
+
+# Database (contains user data - should not be shared)
+*.db
+
+# Uploaded audio files
+uploads/
+
+# Generated PDFs
+generated/
+
+# IDE settings
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+Thumbs.db
+.DS_Store
+
+# Environment variables
+.env

@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Print Summary | {{ summary.patient_name }}</title>
+    <style>
+        @media print {
+            body {
+                font-size: 11pt;
+            }
+
+            .no-print {
+                display: none !important;
+            }
+        }
+
+        @media screen {
+            body {
+                background: #f5f5f5;
+            }
+
+            .print-container {
+                max-width: 800px;
+                margin: 20px auto;
+                background: white;
+                padding: 40px 50px;
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            }
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Times New Roman', serif;
+            line-height: 1.6;
+            color: #000;
+        }
+
+        .print-container {
+            padding: 30px;
+        }
+
+        .header {
+            text-align: center;
+            border-bottom: 2px double #000;
+            padding-bottom: 12px;
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            font-size: 18pt;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        .section {
+            margin-bottom: 16px;
+        }
+
+        .section-title {
+            font-size: 11pt;
+            font-weight: bold;
+            margin-bottom: 6px;
+        }
+
+        .field-inline {
+            margin-bottom: 4px;
+        }
+
+        .field-label {
+            font-weight: bold;
+        }
+
+        .text-content {
+            margin-left: 0;
+            white-space: pre-wrap;
+        }
+
+        .two-col {
+            display: flex;
+            gap: 40px;
+        }
+
+        .two-col>div {
+            flex: 1;
+        }
+
+        .footer {
+            margin-top: 50px;
+            padding-top: 20px;
+        }
+
+        .signature-area {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 60px;
+        }
+
+        .signature-box {
+            text-align: center;
+            width: 180px;
+        }
+
+        .signature-line {
+            border-top: 1px solid #000;
+            padding-top: 8px;
+        }
+
+        .print-actions {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #6366f1;
+            padding: 12px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .print-actions button,
+        .print-actions a {
+            display: block;
+            margin: 5px 0;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        .print-actions .btn-print {
+            background: white;
+            color: #6366f1;
+            font-weight: bold;
+        }
+
+        .print-actions .btn-back {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="no-print print-actions">
+        <button class="btn-print" onclick="window.print()">🖨️ Print</button>
+        <a href="/summary/{{ summary.id }}" class="btn-back">← Back</a>
+    </div>
+
+    <div class="print-container">
+        <div class="header">
+            <h1>DISCHARGE SUMMARY</h1>
+        </div>
+
+        <!-- Patient Information -->
+        <div class="section">
+            <div class="section-title">Patient Information</div>
+            <div class="field-inline">
+                <span class="field-label">Name:</span> {{ summary.patient_name or '-' }}
+            </div>
+            <div class="two-col">
+                <div>
+                    <div class="field-inline"><span class="field-label">Age / Sex:</span> {{ summary.patient_age or '-'
+                        }} / {{ summary.patient_sex or '-' }}</div>
+                    <div class="field-inline"><span class="field-label">Hospital ID:</span> {{ summary.hospital_id or
+                        '-' }}</div>
+                </div>
+                <div>
+                    <div class="field-inline"><span class="field-label">Admission:</span> {{ summary.admission_date or
+                        '-' }}</div>
+                    <div class="field-inline"><span class="field-label">Discharge:</span> {{ summary.discharge_date or
+                        '-' }}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Diagnosis -->
+        <div class="section">
+            <div class="section-title">Diagnosis</div>
+            <div class="text-content">{{ summary.diagnosis or 'Not specified' }}</div>
+        </div>
+
+        <!-- History & Hospital Course -->
+        {% if summary.chief_complaints or summary.history_of_illness %}
+        <div class="section">
+            <div class="section-title">History & Hospital Course</div>
+            {% if summary.chief_complaints %}
+            <div class="field-inline"><span class="field-label">Presenting complaints:</span> {{
+                summary.chief_complaints }}</div>
+            {% endif %}
+            {% if summary.history_of_illness %}
+            <div class="text-content">{{ summary.history_of_illness }}</div>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        <!-- Investigations -->
+        {% if summary.investigations %}
+        <div class="section">
+            <div class="section-title">Investigations</div>
+            <div class="text-content">{{ summary.investigations }}</div>
+        </div>
+        {% endif %}
+
+        <!-- Treatment -->
+        {% if summary.treatment_given %}
+        <div class="section">
+            <div class="section-title">Treatment Given</div>
+            <div class="text-content">{{ summary.treatment_given }}</div>
+        </div>
+        {% endif %}
+
+        <!-- Medications -->
+        {% if summary.medications %}
+        <div class="section">
+            <div class="section-title">Medications</div>
+            <div class="text-content">{{ summary.medications }}</div>
+        </div>
+        {% endif %}
+
+        <!-- Condition at Discharge -->
+        {% if summary.condition_at_discharge %}
+        <div class="section">
+            <div class="section-title">Condition at Discharge</div>
+            <div class="text-content">{{ summary.condition_at_discharge }}</div>
+        </div>
+        {% endif %}
+
+        <!-- Follow-up -->
+        {% if summary.follow_up_instructions %}
+        <div class="section">
+            <div class="section-title">Follow-up</div>
+            <div class="text-content">{{ summary.follow_up_instructions }}</div>
+        </div>
+        {% endif %}
+
+        <!-- Signature Area -->
+        <div class="footer">
+            <div class="signature-area">
+                <div class="signature-box">
+                    <div class="signature-line">Date</div>
+                </div>
+                <div class="signature-box">
+                    <div class="signature-line">Doctor's Signature</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
